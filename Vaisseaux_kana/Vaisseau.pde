@@ -123,30 +123,27 @@ class Vaisseau {
 
   boolean isMouseOnGrid() {
     if (centreMasse != null) {
-
-      PVector coin1 = new PVector(-allBlocks.length * Block.tailleBloc/2, -allBlocks[0].length * Block.tailleBloc/2);
-      coin1.rotate(dir.heading());
-      PVector centreMasseOffset = centreMasse.copy();
-      centreMasseOffset.sub(new PVector(allBlocks.length * Block.tailleBloc/2, allBlocks[0].length * Block.tailleBloc/2));
-      println(centreMasseOffset);
-      coin1.add(centreMasseOffset);
-      centreMasseOffset.rotate(dir.heading());
-      coin1.sub(centreMasseOffset);
-      coin1.add(pos);
-      rect(coin1.x, coin1.y, 10, 10);
+      PVector coin1 = getBlockPosition(0, 0);
+      PVector coin2 = getBlockPosition(allBlocks.length, 0);
+      PVector coin3 = getBlockPosition(0, allBlocks[0].length);
+      PVector coin4 = getBlockPosition(allBlocks.length, allBlocks[0].length);
       
-      PVector coin2 = new PVector(-allBlocks.length * Block.tailleBloc/2, -allBlocks[0].length * Block.tailleBloc/2);
-      coin2.rotate(dir.heading());
-      centreMasseOffset.set(centreMasse.copy());
-      centreMasseOffset.sub(new PVector(allBlocks.length * Block.tailleBloc/2, allBlocks[0].length * Block.tailleBloc/2));
-      println(centreMasseOffset);
-      coin2.add(centreMasseOffset);
-      centreMasseOffset.rotate(dir.heading());
-      coin2.sub(centreMasseOffset);
-      coin2.add(pos);
-      rect(coin2.x, coin2.y, 10, 10);
+      //Premier tri
+      return IsPointInTriangle(new PVector(mouseX, mouseY), coin1, coin2, coin3) || IsPointInTriangle(new PVector(mouseX, mouseY), coin4, coin2, coin3);
     }
-
     return true;
+  }
+  
+  PVector getBlockPosition(int x, int y) {
+
+    //Magik happens
+    PVector posCM = pos.copy();
+    posCM.add(new PVector(- allBlocks.length * Block.tailleBloc / 2, - allBlocks[0].length * Block.tailleBloc / 2));
+    posCM.add(centreMasse);
+    PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), centreMasse);
+    CMaCoin.rotate(dir.heading());
+    posCM.add(CMaCoin);
+    
+    return posCM;
   }
 }
