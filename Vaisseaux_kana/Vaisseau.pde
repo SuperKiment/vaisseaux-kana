@@ -2,10 +2,11 @@ class Vaisseau {
 
   PVector pos, dir, vel
     , centreMasse;
-  float speed = 5, puissance = 0.01;
+  float speed = 5, puissance = 0.01,
+    rotSpeed = 0, rotPuissance = 0.001;
   Block[][] allBlocks;
   boolean displayGrid = true,
-    up = false, down = false, left = false, right = false;
+    up = false, down = false, left = false, right = false, straftL = false, straftR = false;
 
   Vaisseau() {
     pos = new PVector();
@@ -14,6 +15,15 @@ class Vaisseau {
     dir.setMag(1);
 
     allBlocks = new Block[10][10];
+
+    addBlock(5, 5, new Block());
+    addBlock(6, 5, new Block());
+    addBlock(7, 5, new Block());
+    addBlock(8, 5, new Block());
+
+    addBlock(5, 4, new Block());
+    addBlock(6, 4, new Block());
+    addBlock(7, 4, new Block());
   }
 
   void Render() {
@@ -53,6 +63,9 @@ class Vaisseau {
     fill(255, 0, 0);
     ellipse(centreMasse.x, centreMasse.y, 10, 10);
     pop();
+
+
+
     pop();
   }
 
@@ -71,14 +84,39 @@ class Vaisseau {
       vel.sub(subvel);
     }
 
+    if (straftL) {
+      PVector straftvel = dir.copy();
+      straftvel.rotate(-PI/2);
+      straftvel.setMag(speed*(puissance/3));
+      vel.add(straftvel);
+    }
+
+    if (straftR) {
+      PVector straftvel = dir.copy();
+      straftvel.rotate(PI/2);
+      straftvel.setMag(speed*(puissance/3));
+      vel.add(straftvel);
+    }
+
     if (left) {
-      dir.rotate(-.05);
+      rotSpeed -= rotPuissance;
     }
-
     if (right) {
-      dir.rotate(.05);
+      rotSpeed += rotPuissance;
     }
 
+    if (!left && !right) {
+      rotSpeed = lerp(rotSpeed, 0, 0.01);
+      println(rotSpeed);
+      if (abs(rotSpeed) < 0.0025) rotSpeed = 0;
+    }
+
+    if (!up && !down && !straftL && !straftR) {
+      if (vel.mag() < .07) vel.setMag(0);
+      if (vel.mag() < .3) vel.lerp(new PVector(), 0.01f);
+    }
+
+    dir.rotate(rotSpeed);
     pos.add(vel);
 
     for (int x=0; x<allBlocks.length; x++) {
@@ -92,6 +130,9 @@ class Vaisseau {
   }
 
   void addBlock(int x, int y, Block b) {
+    b.x = x;
+    b.y = y;
+
     if (x >= 0 && x < allBlocks.length && y >= 0 && y < allBlocks[0].length) {
       if (allBlocks[x][y] == null) {
         allBlocks[x][y] = b;
@@ -127,13 +168,13 @@ class Vaisseau {
       PVector coin2 = getBlockPosition(allBlocks.length, 0);
       PVector coin3 = getBlockPosition(0, allBlocks[0].length);
       PVector coin4 = getBlockPosition(allBlocks.length, allBlocks[0].length);
-      
+
       //Premier tri
       return IsPointInTriangle(new PVector(mouseX, mouseY), coin1, coin2, coin3) || IsPointInTriangle(new PVector(mouseX, mouseY), coin4, coin2, coin3);
     }
     return true;
   }
-  
+
   PVector getBlockPosition(int x, int y) {
 
     //Magik happens
@@ -143,7 +184,47 @@ class Vaisseau {
     PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), centreMasse);
     CMaCoin.rotate(dir.heading());
     posCM.add(CMaCoin);
-    
+
     return posCM;
+  }
+
+
+
+
+
+
+
+  //=======================LIAISON BLOCK
+
+  class LiaisonBlock {
+    ArrayList<Block> blocks;
+
+    LiaisonBlock() {
+      RecreateBlocks();
+    }
+
+    void Render() {
+      int minX=999, minY=999, maxX=-1, maxY=-1;
+
+      for (Block b : blocks) {
+        if (b.x < minX) minX = b.x;
+        if (b.x > maxX) maxX = b.x;
+        if (b.y < minX) minX = b.y;
+        if (b.y > maxX) maxX = b.y;
+      }
+
+      rect(minX*Block.tailleBloc, minY*Block.tailleBloc, maxX*Block.tailleBloc, maxY*Block.tailleBloc);
+    }
+
+    void RecreateBlocks() {
+      for (Block b : blocks) b.linked = false;
+      blocks.clear();
+
+      for (int x=0; x<allBlocks.length; x++) {
+        for (int y=0; y<allBlocks[0].length; y++) {
+          
+        }
+      }
+    }
   }
 }
