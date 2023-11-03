@@ -1,5 +1,5 @@
 class Block {
-  final static int tailleBloc = 20;
+  final static int tailleBloc = 40;
   Vaisseau parent;
   int x, y;
   boolean linked = false;
@@ -15,13 +15,33 @@ class Block {
   void Update() {
   }
 
-  PVector getMapPosition(Vaisseau vaisseau, int posX, int posY) {
+  PVector getMapPosition() {
 
-    PVector position = new PVector(-vaisseau.allBlocks.length * Block.tailleBloc/2, -vaisseau.allBlocks[0].length * Block.tailleBloc/2);
+    PVector posCM = parent.pos.copy();
+    posCM.add(new PVector(- parent.allBlocks.length * Block.tailleBloc / 2, - parent.allBlocks[0].length * Block.tailleBloc / 2));
+    posCM.add(parent.centreMasse);
+    PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), parent.centreMasse);
+    CMaCoin.rotate(parent.dir.heading());
+    posCM.add(CMaCoin);
+
+    return posCM;
+  }
+}
 
 
-    rect(position.x, position.y, 10, 10);
 
-    return position;
+class Tourelle {
+  Block parent;
+  PVector pos;
+
+  Tourelle(Block p) {
+    parent = p;
+    pos = p.getMapPosition();
+  }
+
+  void Update() {
+  }
+
+  void Render() {
   }
 }

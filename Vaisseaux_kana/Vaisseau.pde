@@ -7,6 +7,8 @@ class Vaisseau {
   Block[][] allBlocks;
   boolean displayGrid = true,
     up = false, down = false, left = false, right = false, straftL = false, straftR = false;
+  FormeVaisseau formeVaisseau;
+  ArrayList<Tourelle> allTourelles;
 
   Vaisseau() {
     pos = new PVector();
@@ -24,29 +26,48 @@ class Vaisseau {
     addBlock(5, 4, new Block());
     addBlock(6, 4, new Block());
     addBlock(7, 4, new Block());
+
+    formeVaisseau = new FormeVaisseau(allBlocks);
   }
 
   void Render() {
+    //Base translate
     push();
     translate(pos.x, pos.y);
     translate(- allBlocks.length * Block.tailleBloc / 2, - allBlocks[0].length * Block.tailleBloc / 2);
     translate(centreMasse.x, centreMasse.y);
     rotate(dir.heading());
     translate(-centreMasse.x, -centreMasse.y);
+
     if (displayGrid) {
-      push();
-      fill(0, 0, 0, 0);
-      stroke(0, 255, 255);
-      for (int x=0; x<allBlocks.length; x++) {
-        for (int y=0; y<allBlocks[0].length; y++) {
-          rect(x*Block.tailleBloc, y*Block.tailleBloc, Block.tailleBloc, Block.tailleBloc);
-        }
-      }
-      pop();
+      RenderGrid();
     }
 
+    //Centre du vaisseau
     rect((allBlocks.length-.5) * Block.tailleBloc/2, (allBlocks[0].length-.5) * Block.tailleBloc/2, 10, 10);
 
+    RenderBlocks();
+
+    RenderCentreDeMasse();
+
+    formeVaisseau.Render();
+
+    pop();
+  }
+
+  void RenderGrid() {
+    push();
+    fill(0, 0, 0, 0);
+    stroke(0, 255, 255);
+    for (int x=0; x<allBlocks.length; x++) {
+      for (int y=0; y<allBlocks[0].length; y++) {
+        rect(x*Block.tailleBloc, y*Block.tailleBloc, Block.tailleBloc, Block.tailleBloc);
+      }
+    }
+    pop();
+  }
+
+  void RenderBlocks() {
     for (int x=0; x<allBlocks.length; x++) {
       for (int y=0; y<allBlocks[0].length; y++) {
         if (allBlocks[x][y] != null) {
@@ -58,20 +79,34 @@ class Vaisseau {
         }
       }
     }
+  }
 
+  void RenderCentreDeMasse() {
     push();
     fill(255, 0, 0);
     ellipse(centreMasse.x, centreMasse.y, 10, 10);
-    pop();
-
-
-
     pop();
   }
 
   void Update() {
     centreMasse = trouverCentreMasse();
 
+    Input();
+
+    dir.rotate(rotSpeed);
+    pos.add(vel);
+
+    for (int x=0; x<allBlocks.length; x++) {
+      for (int y=0; y<allBlocks[0].length; y++) {
+        if (allBlocks[x][y] != null) {
+          Block b = allBlocks[x][y];
+          b.Update();
+        }
+      }
+    }
+  }
+
+  void Input() {
     if (up) {
       PVector addvel = dir.copy();
       addvel.setMag(speed*puissance);
@@ -107,25 +142,12 @@ class Vaisseau {
 
     if (!left && !right) {
       rotSpeed = lerp(rotSpeed, 0, 0.01);
-      println(rotSpeed);
       if (abs(rotSpeed) < 0.0025) rotSpeed = 0;
     }
 
     if (!up && !down && !straftL && !straftR) {
       if (vel.mag() < .07) vel.setMag(0);
       if (vel.mag() < .3) vel.lerp(new PVector(), 0.01f);
-    }
-
-    dir.rotate(rotSpeed);
-    pos.add(vel);
-
-    for (int x=0; x<allBlocks.length; x++) {
-      for (int y=0; y<allBlocks[0].length; y++) {
-        if (allBlocks[x][y] != null) {
-          Block b = allBlocks[x][y];
-          b.Update();
-        }
-      }
     }
   }
 
@@ -136,7 +158,6 @@ class Vaisseau {
     if (x >= 0 && x < allBlocks.length && y >= 0 && y < allBlocks[0].length) {
       if (allBlocks[x][y] == null) {
         allBlocks[x][y] = b;
-        println("added en", x, y);
       } else println("déjà un block");
     } else println("block out of bound");
   }
@@ -194,36 +215,105 @@ class Vaisseau {
 
 
 
-  //=======================LIAISON BLOCK
+  //=======================FORME VAISSEAU
 
-  class LiaisonBlock {
-    ArrayList<Block> blocks;
 
-    LiaisonBlock() {
-      RecreateBlocks();
+
+
+  class FormeVaisseau {
+    ArrayList<PVector> forme;
+
+    FormeVaisseau(Block[][] bs) {
+      forme = Cherche(bs);
+    }
+
+    ArrayList<PVector> Cherche(Block[][] blocks) {
+      ArrayList<PVector> points = new ArrayList<PVector>();
+      int direction = 0, // 0 : L  /  1 : U  /  2 : R  /  3 : B
+        px = -1, py = -1, basePx = -2, basePy = -2;
+      boolean fini = false;
+      boolean changDir = false;
+
+
+      while (!fini) {
+        //Si on a pas de premier block, le trouver
+        if (px == -1 && py == -1) {
+          boolean br = false;
+
+          for (int x=0; x<blocks.length; x++) {
+            for (int y=0; y<blocks[0].length; y++) {
+              if (blocks[x][y] != null) {
+                px = x;
+                py = y;
+                basePx = x;
+                basePy = x;
+                points.add(new PVector(px, py));
+                br = true;
+                break;
+              }
+            }
+            if (br) break;
+          }
+        }
+
+
+        switch(direction) {
+        case 0:
+          if (blocks[px][py] != null && blocks[px][py-1] == null) {
+            px++;
+            points.add(new PVector(px, py));
+          } else changDir = true;
+          break;
+        case 1:
+          if (blocks[px][py-1] != null && blocks[px-1][py-1] == null) {
+            py--;
+            points.add(new PVector(px, py));
+          } else changDir = true;
+          break;
+        case 2:
+          if (blocks[px-1][py] == null && blocks[px-1][py-1] != null) {
+            px--;
+            points.add(new PVector(px, py));
+          } else changDir = true;
+          break;
+        case 3:
+          if (blocks[px][py] == null && blocks[px-1][py] != null) {
+            py++;
+            points.add(new PVector(px, py));
+          } else changDir = true;
+          break;
+        }
+
+        if (changDir) {
+          direction++;
+          direction%=4;
+        }
+
+        if (px == basePx && py == basePy) fini = true;
+      }
+
+      for (int i=0; i<points.size()-2; i++) {
+        PVector v0 = points.get(i);
+        PVector v1 = points.get(i+1);
+        PVector v2 = points.get(i+2);
+
+        if (v0.x == v1.x && v1.x == v2.x
+          || v0.y == v1.y && v1.y == v2.y) {
+          points.remove(v1);
+          i--;
+        }
+      }
+
+      return points;
     }
 
     void Render() {
-      int minX=999, minY=999, maxX=-1, maxY=-1;
-
-      for (Block b : blocks) {
-        if (b.x < minX) minX = b.x;
-        if (b.x > maxX) maxX = b.x;
-        if (b.y < minX) minX = b.y;
-        if (b.y > maxX) maxX = b.y;
-      }
-
-      rect(minX*Block.tailleBloc, minY*Block.tailleBloc, maxX*Block.tailleBloc, maxY*Block.tailleBloc);
-    }
-
-    void RecreateBlocks() {
-      for (Block b : blocks) b.linked = false;
-      blocks.clear();
-
-      for (int x=0; x<allBlocks.length; x++) {
-        for (int y=0; y<allBlocks[0].length; y++) {
-          
-        }
+      for (PVector v : formeVaisseau.forme) {
+        push();
+        fill(255, 0, 0);
+        noStroke();
+        ellipse(v.x*Block.tailleBloc, v.y*Block.tailleBloc, 5, 5);
+        pop();
       }
     }
   }

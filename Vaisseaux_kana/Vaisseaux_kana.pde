@@ -3,6 +3,7 @@ Vaisseau focusedVaisseau;
 
 void setup() {
   size(1000, 1000);
+  smooth();
 
   allVaisseaux = new ArrayList<Vaisseau>();
 
@@ -10,11 +11,8 @@ void setup() {
   allVaisseaux.add(v);
   focusedVaisseau = v;
 
-  
-
   v.addBlock(20, 5, new Block());
   v.pos.set(500, 500);
-
 }
 
 void draw() {
