@@ -34,18 +34,23 @@ class Block {
 class Tourelle {
   Block parent;
   float angle = 0, vitesseRot = .05;
-  PVector dirCible, dir;
+  PVector dirCible, dir, cible;
 
   Tourelle(Block p) {
     parent = p;
     dirCible = new PVector();
     dir = new PVector(1, 0);
+    cible = new PVector();
   }
 
   void Update() {
     dirCible.set(1, 0);
     dirCible.rotate(getSourisAngle());
     dir.lerp(dirCible, vitesseRot);
+
+    if (parent.parent.isFocused) {
+      cible.set(mouseX, mouseY);
+    }
   }
 
   void Render() {
@@ -71,8 +76,7 @@ class Tourelle {
     PVector dirV = new PVector(Block.tailleBloc/2, Block.tailleBloc/2);
     dirV.rotate(parent.parent.dir.heading());
     pos.add(dirV);
-    PVector mousePos = new PVector(mouseX, mouseY);
-    PVector dest = PVector.sub(pos, mousePos);
+    PVector dest = PVector.sub(pos, cible);
 
     return dest.heading();
   }

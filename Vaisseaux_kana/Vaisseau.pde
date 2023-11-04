@@ -6,9 +6,11 @@ class Vaisseau {
     rotSpeed = 0, rotPuissance = 0.001;
   Block[][] allBlocks;
   boolean displayGrid = false,
-    up = false, down = false, left = false, right = false, straftL = false, straftR = false;
+    up = false, down = false, left = false, right = false, straftL = false, straftR = false,
+    isFocused = false;
   FormeVaisseau formeVaisseau;
   ArrayList<Tourelle> allTourelles;
+  String ID = String.valueOf(int(random(10000, 99999)));
 
   Vaisseau() {
     pos = new PVector();
@@ -327,7 +329,6 @@ class Vaisseau {
         }
       }
 
-      println(points);
       return points;
     }
 
@@ -350,7 +351,6 @@ class Vaisseau {
         PVector v2 = getBlockPosition(int(v.x), int(v.y));
         forme2.add(v2);
       }
-      println(forme2);
 
       for (int i = 0; i<nbSommets; i++) {
         PVector v1 = forme2.get(i);

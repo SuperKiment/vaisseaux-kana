@@ -9,12 +9,13 @@ void setup() {
 
   Vaisseau v = new Vaisseau();
   allVaisseaux.add(v);
-  focusedVaisseau = v;
   v.pos.set(500, 500);
 
   Vaisseau v2 = new Vaisseau();
   allVaisseaux.add(v2);
   v2.pos.set(400, 500);
+
+  ChangerVaisseau(v);
 }
 
 void draw() {
@@ -43,7 +44,7 @@ void draw() {
 void mousePressed() {
   for (Vaisseau v : allVaisseaux) {
     if (v.formeVaisseau.isPointInPolygon(mouseX, mouseY)) {
-      focusedVaisseau = v;
+      ChangerVaisseau(v);
     }
   }
 }
@@ -64,4 +65,14 @@ void keyReleased() {
   if (key == 'd') focusedVaisseau.right = false;
   if (key == 'a') focusedVaisseau.straftL = false;
   if (key == 'e') focusedVaisseau.straftR = false;
+}
+
+void ChangerVaisseau(Vaisseau v) {
+  if (focusedVaisseau == null) {
+    focusedVaisseau = v;
+  }
+  focusedVaisseau.displayGrid = false;
+  focusedVaisseau.isFocused = false;
+  focusedVaisseau = v;
+  focusedVaisseau.isFocused = true;
 }
