@@ -8,7 +8,6 @@ class Block {
   }
 
   void Render() {
-
     rect(0, 0, tailleBloc, tailleBloc);
   }
 
@@ -16,32 +15,65 @@ class Block {
   }
 
   PVector getMapPosition() {
+    if (parent != null) {
+      PVector posCM = parent.pos.copy();
+      posCM.add(new PVector(- parent.allBlocks.length * Block.tailleBloc / 2, - parent.allBlocks[0].length * Block.tailleBloc / 2));
+      posCM.add(parent.centreMasse);
+      PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), parent.centreMasse);
+      CMaCoin.rotate(parent.dir.heading());
+      posCM.add(CMaCoin);
+      return posCM;
+    }
 
-    PVector posCM = parent.pos.copy();
-    posCM.add(new PVector(- parent.allBlocks.length * Block.tailleBloc / 2, - parent.allBlocks[0].length * Block.tailleBloc / 2));
-    posCM.add(parent.centreMasse);
-    PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), parent.centreMasse);
-    CMaCoin.rotate(parent.dir.heading());
-    posCM.add(CMaCoin);
-
-    return posCM;
+    return new PVector(0, 0);
   }
 }
 
-
+//==============================================================
 
 class Tourelle {
   Block parent;
-  PVector pos;
+  float angle = 0, vitesseRot = .05;
+  PVector dirCible, dir;
 
   Tourelle(Block p) {
     parent = p;
-    pos = p.getMapPosition();
+    dirCible = new PVector();
+    dir = new PVector(1, 0);
   }
 
   void Update() {
+    dirCible.set(1, 0);
+    dirCible.rotate(getSourisAngle());
+    dir.lerp(dirCible, vitesseRot);
   }
 
   void Render() {
+    push();
+    translate(parent.x*Block.tailleBloc+Block.tailleBloc/2,
+      parent.y*Block.tailleBloc+Block.tailleBloc/2);
+    ellipse(0, 0,
+      Block.tailleBloc/2,
+      Block.tailleBloc/2);
+
+    rotate(dir.heading()-parent.parent.dir.heading());
+    push();
+    rectMode(CENTER);
+    rect(-Block.tailleBloc/2, 0,
+      Block.tailleBloc,
+      Block.tailleBloc/2);
+    pop();
+    pop();
+  }
+
+  float getSourisAngle() {
+    PVector pos = parent.getMapPosition().copy();
+    PVector dirV = new PVector(Block.tailleBloc/2, Block.tailleBloc/2);
+    dirV.rotate(parent.parent.dir.heading());
+    pos.add(dirV);
+    PVector mousePos = new PVector(mouseX, mouseY);
+    PVector dest = PVector.sub(pos, mousePos);
+
+    return dest.heading();
   }
 }

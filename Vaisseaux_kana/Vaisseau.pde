@@ -5,7 +5,7 @@ class Vaisseau {
   float speed = 5, puissance = 0.01,
     rotSpeed = 0, rotPuissance = 0.001;
   Block[][] allBlocks;
-  boolean displayGrid = true,
+  boolean displayGrid = false,
     up = false, down = false, left = false, right = false, straftL = false, straftR = false;
   FormeVaisseau formeVaisseau;
   ArrayList<Tourelle> allTourelles;
@@ -28,6 +28,10 @@ class Vaisseau {
     addBlock(7, 4, new Block());
 
     formeVaisseau = new FormeVaisseau(allBlocks);
+
+    allTourelles = new ArrayList<Tourelle>();
+    allTourelles.add(new Tourelle(allBlocks[5][5]));
+    allTourelles.add(new Tourelle(allBlocks[7][5]));
   }
 
   void Render() {
@@ -44,14 +48,14 @@ class Vaisseau {
     }
 
     //Centre du vaisseau
-    rect((allBlocks.length-.5) * Block.tailleBloc/2, (allBlocks[0].length-.5) * Block.tailleBloc/2, 10, 10);
+    //rect((allBlocks.length-.5) * Block.tailleBloc/2, (allBlocks[0].length-.5) * Block.tailleBloc/2, 10, 10);
 
     RenderBlocks();
 
-    RenderCentreDeMasse();
-
+    //RenderCentreDeMasse();
     formeVaisseau.Render();
 
+    RenderTourelles();
     pop();
   }
 
@@ -88,6 +92,12 @@ class Vaisseau {
     pop();
   }
 
+  void RenderTourelles() {
+    for (Tourelle t : allTourelles) {
+      t.Render();
+    }
+  }
+
   void Update() {
     centreMasse = trouverCentreMasse();
 
@@ -103,6 +113,10 @@ class Vaisseau {
           b.Update();
         }
       }
+    }
+
+    for (Tourelle t : allTourelles) {
+      t.Update();
     }
   }
 
@@ -154,6 +168,7 @@ class Vaisseau {
   void addBlock(int x, int y, Block b) {
     b.x = x;
     b.y = y;
+    b.parent = this;
 
     if (x >= 0 && x < allBlocks.length && y >= 0 && y < allBlocks[0].length) {
       if (allBlocks[x][y] == null) {
@@ -175,7 +190,6 @@ class Vaisseau {
       }
     }
 
-
     res.div(nb);
     res.mult(Block.tailleBloc);
     res.add(new PVector(Block.tailleBloc/2, Block.tailleBloc/2));
@@ -194,6 +208,14 @@ class Vaisseau {
       return IsPointInTriangle(new PVector(mouseX, mouseY), coin1, coin2, coin3) || IsPointInTriangle(new PVector(mouseX, mouseY), coin4, coin2, coin3);
     }
     return true;
+  }
+
+  boolean isMouseOnBlocks() {
+    if (isMouseOnGrid()) {
+      if (formeVaisseau.isPointInPolygon(mouseX, mouseY))
+        return true;
+    }
+    return false;
   }
 
   PVector getBlockPosition(int x, int y) {
@@ -292,10 +314,11 @@ class Vaisseau {
         if (px == basePx && py == basePy) fini = true;
       }
 
-      for (int i=0; i<points.size()-2; i++) {
+      //CLEAN
+      for (int i=0; i<(points.size()-1); i++) {
         PVector v0 = points.get(i);
         PVector v1 = points.get(i+1);
-        PVector v2 = points.get(i+2);
+        PVector v2 = points.get((i+2)%points.size());
 
         if (v0.x == v1.x && v1.x == v2.x
           || v0.y == v1.y && v1.y == v2.y) {
@@ -304,6 +327,7 @@ class Vaisseau {
         }
       }
 
+      println(points);
       return points;
     }
 
@@ -315,6 +339,30 @@ class Vaisseau {
         ellipse(v.x*Block.tailleBloc, v.y*Block.tailleBloc, 5, 5);
         pop();
       }
+    }
+
+    boolean isPointInPolygon(int px, int py) {
+      boolean aLinterieur = false;
+      int nbSommets = forme.size();
+      ArrayList<PVector> forme2 = new ArrayList<PVector>();
+
+      for (PVector v : forme) {
+        PVector v2 = getBlockPosition(int(v.x), int(v.y));
+        forme2.add(v2);
+      }
+      println(forme2);
+
+      for (int i = 0; i<nbSommets; i++) {
+        PVector v1 = forme2.get(i);
+        PVector v2 = forme2.get((i+1)%nbSommets);
+
+        //And magik occurs (merci internet sur ce coup là)
+        if ((v1.y>py) != (v2.y>py) && px < (v2.x - v1.x) * (py - v1.y) / (v2.y - v1.y) + v1.x) {
+          aLinterieur = !aLinterieur;
+        }
+      }
+
+      return aLinterieur;
     }
   }
 }

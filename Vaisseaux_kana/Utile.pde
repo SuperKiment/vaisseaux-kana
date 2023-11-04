@@ -19,3 +19,7 @@ boolean IsPointInTriangle(PVector point, PVector p1, PVector p2, PVector p3) {
   // Check if the point is inside the triangle
   return (u >= 0) && (v >= 0) && (u + v <= 1);
 }
+
+int getSign(float val) {
+  return int(val/abs(val));
+}

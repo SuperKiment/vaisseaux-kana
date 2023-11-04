@@ -10,9 +10,11 @@ void setup() {
   Vaisseau v = new Vaisseau();
   allVaisseaux.add(v);
   focusedVaisseau = v;
-
-  v.addBlock(20, 5, new Block());
   v.pos.set(500, 500);
+
+  Vaisseau v2 = new Vaisseau();
+  allVaisseaux.add(v2);
+  v2.pos.set(400, 500);
 }
 
 void draw() {
@@ -28,13 +30,21 @@ void draw() {
   }
   pop();
 
+  focusedVaisseau.displayGrid = focusedVaisseau.isMouseOnGrid();
   for (int i=0; i<allVaisseaux.size(); i++) {
     Vaisseau v = allVaisseaux.get(i);
-
-    v.displayGrid = v.isMouseOnGrid();
-
     v.Update();
     v.Render();
+  }
+  text(mouseX, mouseX, mouseY+30);
+  text(mouseY, mouseX, mouseY+40);
+}
+
+void mousePressed() {
+  for (Vaisseau v : allVaisseaux) {
+    if (v.formeVaisseau.isPointInPolygon(mouseX, mouseY)) {
+      focusedVaisseau = v;
+    }
   }
 }
 
