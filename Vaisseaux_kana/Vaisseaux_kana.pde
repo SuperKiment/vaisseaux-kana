@@ -1,4 +1,5 @@
 ArrayList<Vaisseau> allVaisseaux;
+ArrayList<Projectile> allProjectiles;
 Vaisseau focusedVaisseau;
 
 void setup() {
@@ -6,6 +7,7 @@ void setup() {
   smooth();
 
   allVaisseaux = new ArrayList<Vaisseau>();
+  allProjectiles = new ArrayList<Projectile>();
 
   Vaisseau v = new Vaisseau();
   allVaisseaux.add(v);
@@ -31,12 +33,23 @@ void draw() {
   }
   pop();
 
+  //Vaisseaux
   focusedVaisseau.displayGrid = focusedVaisseau.isMouseOnGrid();
   for (int i=0; i<allVaisseaux.size(); i++) {
     Vaisseau v = allVaisseaux.get(i);
     v.Update();
     v.Render();
   }
+
+  //Projectiles
+  for (int i=0; i<allProjectiles.size(); i++) {
+    Projectile p = allProjectiles.get(i);
+    p.Update();
+    p.Render();
+
+    if (p.mort) allProjectiles.remove(i);
+  }
+
   text(mouseX, mouseX, mouseY+30);
   text(mouseY, mouseX, mouseY+40);
 }
@@ -47,6 +60,12 @@ void mousePressed() {
       ChangerVaisseau(v);
     }
   }
+
+  focusedVaisseau.tirer = true;
+}
+
+void mouseReleased() {
+  focusedVaisseau.tirer = false;
 }
 
 void keyPressed() {

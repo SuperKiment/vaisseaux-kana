@@ -7,7 +7,8 @@ class Vaisseau {
   Block[][] allBlocks;
   boolean displayGrid = false,
     up = false, down = false, left = false, right = false, straftL = false, straftR = false,
-    isFocused = false;
+    isFocused = false,
+    tirer = false;
   FormeVaisseau formeVaisseau;
   ArrayList<Tourelle> allTourelles;
   String ID = String.valueOf(int(random(10000, 99999)));
@@ -165,6 +166,8 @@ class Vaisseau {
       if (vel.mag() < .07) vel.setMag(0);
       if (vel.mag() < .3) vel.lerp(new PVector(), 0.01f);
     }
+
+    if (tirer) Tirer();
   }
 
   void addBlock(int x, int y, Block b) {
@@ -233,6 +236,11 @@ class Vaisseau {
     return posCM;
   }
 
+  void Tirer() {
+    for (Tourelle t : allTourelles) {
+      t.Tirer();
+    }
+  }
 
 
 

@@ -1,5 +1,5 @@
 class Block {
-  final static int tailleBloc = 40;
+  final static int tailleBloc = 20;
   Vaisseau parent;
   int x, y;
   boolean linked = false;
@@ -29,12 +29,24 @@ class Block {
   }
 }
 
+
+
+
+
 //==============================================================
+
+
+
+
+
 
 class Tourelle {
   Block parent;
-  float angle = 0, vitesseRot = .05;
+  float angle = 0, vitesseRot = .05,
+    baseCooldown = 400, cooldown, timer,
+    randomness = 1.5;
   PVector dirCible, dir, cible;
+  PVector pos;
 
   Tourelle(Block p) {
     parent = p;
@@ -44,6 +56,7 @@ class Tourelle {
   }
 
   void Update() {
+    pos = parent.getMapPosition().copy();
     dirCible.set(1, 0);
     dirCible.rotate(getSourisAngle());
     dir.lerp(dirCible, vitesseRot);
@@ -64,7 +77,7 @@ class Tourelle {
     rotate(dir.heading()-parent.parent.dir.heading());
     push();
     rectMode(CENTER);
-    rect(-Block.tailleBloc/2, 0,
+    rect(Block.tailleBloc/2, 0,
       Block.tailleBloc,
       Block.tailleBloc/2);
     pop();
@@ -72,12 +85,58 @@ class Tourelle {
   }
 
   float getSourisAngle() {
-    PVector pos = parent.getMapPosition().copy();
     PVector dirV = new PVector(Block.tailleBloc/2, Block.tailleBloc/2);
     dirV.rotate(parent.parent.dir.heading());
     pos.add(dirV);
     PVector dest = PVector.sub(pos, cible);
 
-    return dest.heading();
+    return dest.heading()+PI;
+  }
+
+  void Tirer() {
+    if (millis()-timer > cooldown) {
+      cooldown = random(baseCooldown/randomness, baseCooldown*randomness);
+      timer = millis();
+      allProjectiles.add(new Projectile(pos, dir));
+    }
+  }
+}
+
+
+
+//===================================PROJECTILE
+
+
+
+
+class Projectile {
+  PVector pos, dir;
+  float speed = 8, accel = 1, timeToDeath = 1000, timer;
+  boolean mort = false;
+
+  Projectile(PVector p, PVector d) {
+    pos = p.copy();
+    dir = d.copy();
+    dir.setMag(speed);
+    timer = millis();
+  }
+
+  void Update() {
+    dir.setMag(dir.mag()*accel);
+    pos.add(dir);
+
+    if (millis() - timer > timeToDeath) {
+      mort = true;
+      //Explosion
+    }
+  }
+
+  void Render() {
+    push();
+    translate(pos.x, pos.y);
+    fill(255, 0, 0);
+    noStroke();
+    ellipse(0, 0, Block.tailleBloc/3, Block.tailleBloc/3);
+    pop();
   }
 }
