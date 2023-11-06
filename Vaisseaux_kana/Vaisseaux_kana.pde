@@ -54,19 +54,35 @@ void draw() {
   text(mouseY, mouseX, mouseY+40);
 }
 
+
+
 void mousePressed() {
   for (Vaisseau v : allVaisseaux) {
-    if (v.formeVaisseau.isPointInPolygon(mouseX, mouseY)) {
-      ChangerVaisseau(v);
+    float tailleDiag = sqrt(
+      pow(v.allBlocks.length * Block.tailleBloc / 2, 2)
+      + pow(v.allBlocks[0].length * Block.tailleBloc / 2, 2)
+      );
+
+    if (dist(mouseX, mouseY, v.pos.x, v.pos.y) < tailleDiag) {
+      //Changer vaisseau
+      if (v.formeVaisseau.isPointInPolygon(mouseX, mouseY)) {
+        ChangerVaisseau(v);
+      }
+
+      PVector coordBlockInVaisseau = v.getCoordBlockFromPoint(mouseX, mouseY);
     }
   }
 
   focusedVaisseau.tirer = true;
 }
 
+
+
 void mouseReleased() {
   focusedVaisseau.tirer = false;
 }
+
+
 
 void keyPressed() {
   if (key == 'z') focusedVaisseau.up = true;
@@ -77,6 +93,8 @@ void keyPressed() {
   if (key == 'e') focusedVaisseau.straftR = true;
 }
 
+
+
 void keyReleased() {
   if (key == 'z') focusedVaisseau.up = false;
   if (key == 's') focusedVaisseau.down = false;
@@ -85,6 +103,8 @@ void keyReleased() {
   if (key == 'a') focusedVaisseau.straftL = false;
   if (key == 'e') focusedVaisseau.straftR = false;
 }
+
+
 
 void ChangerVaisseau(Vaisseau v) {
   if (focusedVaisseau == null) {

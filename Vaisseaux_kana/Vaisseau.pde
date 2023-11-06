@@ -242,7 +242,22 @@ class Vaisseau {
     }
   }
 
+  PVector getCoordBlockFromPoint(int px, int py) {
+    PVector res = new PVector();
 
+    for (int x=0; x<allBlocks.length; x++) {
+      for (int y=0; y<allBlocks[0].length; y++) {
+        Block b = allBlocks[x][y];
+        if (b != null) {
+          if (b.isPointInBlockMap()) {
+            println(x, y);
+          }
+        }
+      }
+    }
+
+    return res;
+  }
 
 
 

@@ -27,6 +27,30 @@ class Block {
 
     return new PVector(0, 0);
   }
+
+  boolean isPointInBlockMap() {
+    PVector hg = getMapPosition();
+    PVector hd = hg.copy();
+    PVector bg = hg.copy();
+    PVector bd = hg.copy();
+
+    PVector offset = new PVector(tailleBloc, 0);
+    offset.rotate(parent.dir.heading());
+    hd.add(offset);
+    
+    offset.set(0, tailleBloc);
+    offset.rotate(parent.dir.heading());
+    bg.add(offset);
+    
+    offset.set(tailleBloc, tailleBloc);
+    offset.rotate(parent.dir.heading());
+    bd.add(offset);
+    
+    rect(hg.x, hg.y, 10, 10);
+    rect(bd.x, bd.y, 10, 10);
+    
+    return false;
+  }
 }
 
 
