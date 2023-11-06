@@ -67,9 +67,14 @@ void mousePressed() {
       //Changer vaisseau
       if (v.formeVaisseau.isPointInPolygon(mouseX, mouseY)) {
         ChangerVaisseau(v);
+      } else {
+        //Si on change de vaisseau, ne pas placer de block
+        if (v.isMouseOnGrid()) {
+          PVector coordBlockInVaisseau = v.getCoordBlockFromPoint(mouseX, mouseY);
+          //Ajouter un block
+          if (v.ID.equals(focusedVaisseau.ID)) v.addBlock(int(coordBlockInVaisseau.x), int(coordBlockInVaisseau.y), new Block());
+        }
       }
-
-      PVector coordBlockInVaisseau = v.getCoordBlockFromPoint(mouseX, mouseY);
     }
   }
 

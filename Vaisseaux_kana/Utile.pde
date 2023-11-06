@@ -1,4 +1,4 @@
-boolean IsPointInTriangle(PVector point, PVector p1, PVector p2, PVector p3) {
+static boolean IsPointInTriangle(PVector point, PVector p1, PVector p2, PVector p3) {
   // Calculate vectors for the edges of the triangle
   PVector v0 = new PVector(p3.x - p1.x, p3.y - p1.y);
   PVector v1 = new PVector(p2.x - p1.x, p2.y - p1.y);

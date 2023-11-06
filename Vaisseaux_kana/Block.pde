@@ -13,44 +13,48 @@ class Block {
 
   void Update() {
   }
+}
 
-  PVector getMapPosition() {
-    if (parent != null) {
-      PVector posCM = parent.pos.copy();
-      posCM.add(new PVector(- parent.allBlocks.length * Block.tailleBloc / 2, - parent.allBlocks[0].length * Block.tailleBloc / 2));
-      posCM.add(parent.centreMasse);
-      PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), parent.centreMasse);
-      CMaCoin.rotate(parent.dir.heading());
-      posCM.add(CMaCoin);
-      return posCM;
-    }
 
-    return new PVector(0, 0);
+PVector getMapPosition(Vaisseau parent, int x, int y) {
+  if (parent != null) {
+    PVector posCM = parent.pos.copy();
+    posCM.add(new PVector(- parent.allBlocks.length * Block.tailleBloc / 2, - parent.allBlocks[0].length * Block.tailleBloc / 2));
+    posCM.add(parent.centreMasse);
+    PVector CMaCoin = PVector.sub(new PVector(x*Block.tailleBloc, y*Block.tailleBloc), parent.centreMasse);
+    CMaCoin.rotate(parent.dir.heading());
+    posCM.add(CMaCoin);
+    return posCM;
   }
 
-  boolean isPointInBlockMap() {
-    PVector hg = getMapPosition();
-    PVector hd = hg.copy();
-    PVector bg = hg.copy();
-    PVector bd = hg.copy();
+  return new PVector(0, 0);
+}
 
-    PVector offset = new PVector(tailleBloc, 0);
-    offset.rotate(parent.dir.heading());
-    hd.add(offset);
-    
-    offset.set(0, tailleBloc);
-    offset.rotate(parent.dir.heading());
-    bg.add(offset);
-    
-    offset.set(tailleBloc, tailleBloc);
-    offset.rotate(parent.dir.heading());
-    bd.add(offset);
-    
-    rect(hg.x, hg.y, 10, 10);
-    rect(bd.x, bd.y, 10, 10);
-    
-    return false;
-  }
+boolean isPointInBlockMap(int px, int py, int x, int y, Vaisseau parent) {
+  PVector hg = getMapPosition(parent, x, y);
+  PVector hd = hg.copy();
+  PVector bg = hg.copy();
+  PVector bd = hg.copy();
+
+  PVector offset = new PVector(Block.tailleBloc, 0);
+  offset.rotate(parent.dir.heading());
+  hd.add(offset);
+
+  offset.set(0, Block.tailleBloc);
+  offset.rotate(parent.dir.heading());
+  bg.add(offset);
+
+  offset.set(Block.tailleBloc, Block.tailleBloc);
+  offset.rotate(parent.dir.heading());
+  bd.add(offset);
+
+  if (
+    IsPointInTriangle(new PVector(px, py), hg, hd, bg)
+    || IsPointInTriangle(new PVector(px, py), bd, hd, bg)
+    )
+    return true;
+
+  return false;
 }
 
 
@@ -80,7 +84,7 @@ class Tourelle {
   }
 
   void Update() {
-    pos = parent.getMapPosition().copy();
+    pos = getMapPosition(parent.parent, parent.x, parent.y).copy();
     dirCible.set(1, 0);
     dirCible.rotate(getSourisAngle());
     dir.lerp(dirCible, vitesseRot);
@@ -128,7 +132,10 @@ class Tourelle {
 
 
 
+
+
 //===================================PROJECTILE
+
 
 
 

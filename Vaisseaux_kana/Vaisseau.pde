@@ -243,15 +243,12 @@ class Vaisseau {
   }
 
   PVector getCoordBlockFromPoint(int px, int py) {
-    PVector res = new PVector();
+    PVector res = null;
 
     for (int x=0; x<allBlocks.length; x++) {
       for (int y=0; y<allBlocks[0].length; y++) {
-        Block b = allBlocks[x][y];
-        if (b != null) {
-          if (b.isPointInBlockMap()) {
-            println(x, y);
-          }
+        if (isPointInBlockMap(px, py, x, y, this)) {
+          return new PVector(x, y);
         }
       }
     }
