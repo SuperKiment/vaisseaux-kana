@@ -72,7 +72,7 @@ void mousePressed() {
         if (v.isMouseOnGrid()) {
           PVector coordBlockInVaisseau = v.getCoordBlockFromPoint(mouseX, mouseY);
           //Ajouter un block
-          if (v.ID.equals(focusedVaisseau.ID)) v.addBlock(int(coordBlockInVaisseau.x), int(coordBlockInVaisseau.y), new Block());
+          if (v.ID.equals(focusedVaisseau.ID)) v.addBlock(int(coordBlockInVaisseau.x), int(coordBlockInVaisseau.y), new Block(), false);
         }
       }
     }

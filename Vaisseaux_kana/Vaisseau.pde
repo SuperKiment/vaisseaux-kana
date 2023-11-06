@@ -21,14 +21,14 @@ class Vaisseau {
 
     allBlocks = new Block[10][10];
 
-    addBlock(5, 5, new Block());
-    addBlock(6, 5, new Block());
-    addBlock(7, 5, new Block());
-    addBlock(8, 5, new Block());
+    addBlock(5, 5, new Block(), true);
+    addBlock(6, 5, new Block(), true);
+    addBlock(7, 5, new Block(), true);
+    addBlock(8, 5, new Block(), true);
 
-    addBlock(5, 4, new Block());
-    addBlock(6, 4, new Block());
-    addBlock(7, 4, new Block());
+    addBlock(5, 4, new Block(), true);
+    addBlock(6, 4, new Block(), true);
+    addBlock(7, 4, new Block(), true);
 
     formeVaisseau = new FormeVaisseau(allBlocks);
 
@@ -170,14 +170,19 @@ class Vaisseau {
     if (tirer) Tirer();
   }
 
-  void addBlock(int x, int y, Block b) {
+  void addBlock(int x, int y, Block b, boolean force) {
     b.x = x;
     b.y = y;
     b.parent = this;
 
     if (x >= 0 && x < allBlocks.length && y >= 0 && y < allBlocks[0].length) {
       if (allBlocks[x][y] == null) {
-        allBlocks[x][y] = b;
+        if (force
+          || allBlocks[x+1][y] != null || allBlocks[x-1][y] != null
+          || allBlocks[x][y+1] != null || allBlocks[x][y-1] != null) {
+          allBlocks[x][y] = b;
+          if (formeVaisseau != null) formeVaisseau.UpdateForme(allBlocks);
+        }
       } else println("déjà un block");
     } else println("block out of bound");
   }
@@ -268,7 +273,13 @@ class Vaisseau {
     ArrayList<PVector> forme;
 
     FormeVaisseau(Block[][] bs) {
-      forme = Cherche(bs);
+      forme = new ArrayList<PVector>();
+      UpdateForme(bs);
+    }
+
+    void UpdateForme(Block[][] blocks) {
+      forme.clear();
+      forme = Cherche(blocks);
     }
 
     ArrayList<PVector> Cherche(Block[][] blocks) {
