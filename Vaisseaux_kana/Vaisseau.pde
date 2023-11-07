@@ -55,7 +55,7 @@ class Vaisseau {
 
     RenderBlocks();
 
-    //RenderCentreDeMasse();
+    RenderCentreDeMasse();
     formeVaisseau.Render();
 
     RenderTourelles();
@@ -102,7 +102,17 @@ class Vaisseau {
   }
 
   void Update() {
+    PVector ancienCentreMasse = null;
+    if (centreMasse != null)
+      ancienCentreMasse = centreMasse.copy();
+
     centreMasse = trouverCentreMasse();
+    if (ancienCentreMasse != null)
+      if (PVector.sub(ancienCentreMasse, centreMasse).mag() > 0) {
+        println(PVector.sub(ancienCentreMasse, centreMasse));
+        //pos.add(PVector.sub(ancienCentreMasse, centreMasse));
+        println("sheeesh");
+      }
 
     Input();
 
@@ -301,7 +311,7 @@ class Vaisseau {
                 px = x;
                 py = y;
                 basePx = x;
-                basePy = x;
+                basePy = y;
                 points.add(new PVector(px, py));
                 br = true;
                 break;

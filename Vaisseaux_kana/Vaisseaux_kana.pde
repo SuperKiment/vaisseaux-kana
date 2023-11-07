@@ -15,7 +15,7 @@ void setup() {
 
   Vaisseau v2 = new Vaisseau();
   allVaisseaux.add(v2);
-  v2.pos.set(400, 500);
+  v2.pos.set(200, 500);
 
   ChangerVaisseau(v);
 }

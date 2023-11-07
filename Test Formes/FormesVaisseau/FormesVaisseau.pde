@@ -13,9 +13,13 @@ void setup() {
   allBlocks[4][5] = new Block();
   allBlocks[3][5] = new Block();
   allBlocks[3][4] = new Block();
+  allBlocks[3][6] = new Block();
+  allBlocks[2][5] = new Block();
   allBlocks[5][4] = new Block();
 
   forme = new FormeVaisseau(allBlocks);
+  
+  frameRate(10);
 }
 
 void draw() {

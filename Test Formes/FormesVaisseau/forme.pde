@@ -14,9 +14,9 @@ class FormeVaisseau {
 
   void Cherche(Block[][] blocks) {
 
-    println();
-    println("direction : "+direction);
-    println("test : "+px +" "+py);
+    //println();
+    //println("direction : "+direction);
+    //println("test : "+px +" "+py);
     //Si on a pas de premier block, le trouver
     if (px == -1 && py == -1) {
       boolean br = false;
@@ -27,7 +27,7 @@ class FormeVaisseau {
             px = x;
             py = y;
             basePx = x;
-            basePy = x;
+            basePy = y;
             println(basePx, basePy);
             forme.add(new PVector(px, py));
             br = true;
@@ -38,30 +38,36 @@ class FormeVaisseau {
       }
     }
 
+    boolean avance = false;
+
 
     switch(direction) {
     case 0:
       if (blocks[px][py] != null && blocks[px][py-1] == null) {
         px++;
         forme.add(new PVector(px, py));
+        avance = true;
       } else changDir = true;
       break;
     case 1:
       if (blocks[px][py-1] != null && blocks[px-1][py-1] == null) {
         py--;
         forme.add(new PVector(px, py));
+        avance = true;
       } else changDir = true;
       break;
     case 2:
       if (blocks[px-1][py] == null && blocks[px-1][py-1] != null) {
         px--;
         forme.add(new PVector(px, py));
+        avance = true;
       } else changDir = true;
       break;
     case 3:
       if (blocks[px][py] == null && blocks[px-1][py] != null) {
         py++;
         forme.add(new PVector(px, py));
+        avance = true;
       } else changDir = true;
       break;
     }
@@ -71,7 +77,13 @@ class FormeVaisseau {
       direction%=4;
     }
 
-    if (px == basePx && py == basePy) fini = true;
+    if (avance) println(basePx, basePy, px, py);
+
+
+    if (px == basePx && py == basePy) {
+      println("fini");
+      fini = true;
+    }
   }
 
   void Render() {
