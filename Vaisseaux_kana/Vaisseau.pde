@@ -19,7 +19,7 @@ class Vaisseau {
     vel = new PVector();
     dir.setMag(1);
 
-    allBlocks = new Block[10][10];
+    allBlocks = new Block[20][30];
 
     addBlock(5, 5, new Block(), true);
     addBlock(6, 5, new Block(), true);
@@ -185,7 +185,7 @@ class Vaisseau {
     b.y = y;
     b.parent = this;
 
-    if (x >= 0 && x < allBlocks.length && y >= 0 && y < allBlocks[0].length) {
+    if (x >= 1 && x < allBlocks.length-1 && y >= 1 && y < allBlocks[0].length-1) {
       if (allBlocks[x][y] == null) {
         if (force
           || allBlocks[x+1][y] != null || allBlocks[x-1][y] != null
