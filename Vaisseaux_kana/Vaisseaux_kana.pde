@@ -3,7 +3,7 @@ ArrayList<Projectile> allProjectiles;
 Vaisseau focusedVaisseau;
 
 void setup() {
-  size(1000, 1000);
+  size(1500, 1200);
   smooth();
 
   allVaisseaux = new ArrayList<Vaisseau>();
